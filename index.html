@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
+  <title>minigames</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+    /* El canvas llena SIEMPRE el contenedor; el aspecto real lo define la
+       ventana / el embed de itch.io. El CanvasScaler (ResponsiveCanvas) en
+       Unity se encarga de acomodar la UI a portrait o landscape. */
+    #unity-container {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    #unity-canvas {
+      width: 100%; height: 100%;
+      display: block;
+      background: #000;
+    }
+    #unity-loading-bar {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
+    #unity-progress-bar-empty {
+      width: 220px; height: 16px;
+      margin: 8px auto 0 auto;
+      background: #2a2a2a; border-radius: 8px;
+    }
+    #unity-progress-bar-full {
+      width: 0%; height: 16px;
+      background: #f0f0f0; border-radius: 8px;
+      transition: width 0.1s ease;
+    }
+    #unity-loading-text {
+      color: #ddd; font-family: sans-serif; font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="unity-loading-bar">
+      <div id="unity-loading-text">Cargando…</div>
+      <div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div>
+    </div>
+  </div>
+  <script>
+    var canvas = document.querySelector("#unity-canvas");
+    var loadingBar = document.querySelector("#unity-loading-bar");
+    var progressBarFull = document.querySelector("#unity-progress-bar-full");
+
+    var buildUrl = "Build";
+    var config = {
+      dataUrl: buildUrl + "/Build.data.unityweb",
+      frameworkUrl: buildUrl + "/Build.framework.js.unityweb",
+      codeUrl: buildUrl + "/Build.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "DefaultCompany",
+      productName: "minigames",
+      productVersion: "1.0",
+      // Hace que el buffer de render iguale el tamaño CSS del canvas → responsive.
+      matchWebGLToCanvasSize: true,
+      // Render a resolución nativa del dispositivo (más nítido en celulares).
+      devicePixelRatio: window.devicePixelRatio,
+    };
+
+    loadingBar.style.display = "block";
+
+    var script = document.createElement("script");
+    script.src = buildUrl + "/Build.loader.js";
+    script.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
+        progressBarFull.style.width = (100 * progress) + "%";
+      }).then((unityInstance) => {
+        loadingBar.style.display = "none";
+      }).catch((message) => {
+        alert(message);
+      });
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
