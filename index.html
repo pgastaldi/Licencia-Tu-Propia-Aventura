@@ -68,8 +68,10 @@
       productVersion: "1.0",
       // Hace que el buffer de render iguale el tamaño CSS del canvas → responsive.
       matchWebGLToCanvasSize: true,
-      // Render a resolución nativa del dispositivo (más nítido en celulares).
-      devicePixelRatio: window.devicePixelRatio,
+      // Render a resolución del dispositivo pero con tope: en celulares con DPR 3
+      // renderizar a 3× cuesta mucho (tirones/batería) sin ganancia visible. 2 es
+      // el punto óptimo entre nitidez y rendimiento en móvil.
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
     };
 
     loadingBar.style.display = "block";
